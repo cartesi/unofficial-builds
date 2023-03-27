@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ARG GID=1000
 ARG UID=1000
@@ -13,15 +13,15 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y \
          git \
-	 g++-9 \
+         g++-9 \
          curl \
          make \
          python3 \
-	 python3-distutils \
+         python3-distutils \
          ccache \
-         xz-utils
+         bzip2
 
-RUN curl https://ci.adoptopenjdk.net/userContent/riscv/riscv_toolchain_linux64.tar.xz | tar xJf - -C /opt
+RUN curl https://toolchains.bootlin.com/downloads/releases/toolchains/riscv64-lp64d/tarballs/riscv64-lp64d--glibc--stable-2021.11-1.tar.bz2 | tar xjf - -C /opt
 
 COPY --chown=node:node run.sh /home/node/run.sh
 
