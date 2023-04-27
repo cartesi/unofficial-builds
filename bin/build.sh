@@ -59,6 +59,9 @@ distdir_promote="${distdir}/${disttype_promote}"
 distoutdir="${distdir_promote}/${fullversion}"
 mkdir -p $distoutdir
 
+# give write permission to all, to avoid docker permission issues
+chmod 777 -R ${workdir}
+
 # Build fetch-source, needs to be the first and must succeed
 docker run --rm \
   -v ${sourcedir}:/out \
@@ -76,6 +79,9 @@ for recipe in ${1:-$recipes}; do
   mkdir -p "${ccachedir}/${recipe}"
   sourcemount="-v ${sourcefile}:/home/node/node.tar.xz"
   stagingmount="-v ${stagingoutdir}:/out"
+
+  # give write permission to all (again), to avoid docker permission issues
+  chmod 777 -R ${ccachedir}/${recipe}
 
   shouldbuild="${__dirname}/../recipes/$recipe/should-build.sh"
 
