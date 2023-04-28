@@ -31,7 +31,11 @@ jobs:
           path: build/logs
       - name: save download
         uses: actions/upload-artifact@v3
-        if: always()
         with:
           name: download
           path: build/download
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          files: build/download/${{ github.event.inputs.version }}/*
