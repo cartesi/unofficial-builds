@@ -37,3 +37,9 @@ jobs:
         with:
           name: download
           path: staging/release/${{ github.event.inputs.version }}/
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          files: build/download/release/${{ github.event.inputs.version }}/*
