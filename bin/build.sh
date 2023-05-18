@@ -30,6 +30,7 @@ if [[ "X${1}" = "X" ]]; then
 fi
 
 fullversion="$1"
+shift
 . ${__dirname}/_decode_version.sh
 decode "$fullversion"
 # see _decode_version for all of the magic variables now set and available for use
@@ -58,6 +59,9 @@ distdir_promote="${distdir}/${disttype_promote}"
 distoutdir="${distdir_promote}/${fullversion}"
 mkdir -p $distoutdir
 
+# give write permission to all, to avoid docker permission issues
+chmod 777 -R ${workdir}
+
 # Build fetch-source, needs to be the first and must succeed
 docker run --rm \
   -v ${sourcedir}:/out \
@@ -66,7 +70,7 @@ docker run --rm \
   > ${thislogdir}/fetch-source.log 2>&1
 
 # Build all other recipes
-for recipe in $recipes; do
+for recipe in ${1:-$recipes}; do
   # each recipe has 3 variable components:
   # - individual ~/.ccache directory
   # - a ~/node.tar.xz file that fetch-source has downloaded
@@ -75,6 +79,9 @@ for recipe in $recipes; do
   mkdir -p "${ccachedir}/${recipe}"
   sourcemount="-v ${sourcefile}:/home/node/node.tar.xz"
   stagingmount="-v ${stagingoutdir}:/out"
+
+  # give write permission to all (again), to avoid docker permission issues
+  chmod 777 -R ${ccachedir}/${recipe}
 
   shouldbuild="${__dirname}/../recipes/$recipe/should-build.sh"
 

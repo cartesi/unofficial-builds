@@ -1,0 +1,41 @@
+name: build
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: Node.js version to build
+        required: true
+      arch:
+        type: string
+        description: Architecture to build
+        default: riscv64
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: prepare
+        run: bin/prepare-images.sh "fetch-source ${{ github.event.inputs.arch }}"
+      - name: create build directories
+        run: mkdir -p build/download build/logs build/staging build/.ccache
+      - name: build
+        run: bin/build.sh ${{ github.event.inputs.version }} ${{ github.event.inputs.arch }}
+        env:
+          workdir: build
+      - name: save logs
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: logs
+          path: build/logs
+      - name: save download
+        uses: actions/upload-artifact@v3
+        with:
+          name: download
+          path: build/download
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          files: build/download/release/${{ github.event.inputs.version }}/*
