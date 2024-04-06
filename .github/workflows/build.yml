@@ -1,0 +1,39 @@
+name: build
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: Node.js version to build (starting with 'v')
+        required: true
+      arch:
+        type: string
+        description: Architecture to build
+        default: riscv64
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: unofficial-builds
+
+      - name: build
+        run: bin/local_build.sh -r ${{ github.event.inputs.arch }} -v ${{ github.event.inputs.version }}
+        working-directory: unofficial-builds
+        env:
+          workdir: build
+
+      #      - name: save logs
+      #        uses: actions/upload-artifact@v3
+      #        if: always()
+      #        with:
+      #          name: logs
+      #          path: build/logs
+
+      - name: save download
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: download
+          path: staging/release/${{ github.event.inputs.version }}/
