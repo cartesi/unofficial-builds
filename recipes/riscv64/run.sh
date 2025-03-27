@@ -18,8 +18,8 @@ cd /home/node
 tar -xf node.tar.xz
 cd "node-${fullversion}"
 
-export CC_host="ccache gcc-9"
-export CXX_host="ccache g++-9"
+export CC_host="ccache gcc-13"
+export CXX_host="ccache g++-13"
 export CC="ccache riscv64-linux-gnu-gcc"
 export CXX="ccache riscv64-linux-gnu-g++"
 
